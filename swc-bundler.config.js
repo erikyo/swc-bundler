@@ -2,13 +2,16 @@ import { config } from "@swc/core/spack";
 import path from "path";
 
 module.exports = config({
-  entry: [path.join(process.cwd() + "/src/index.ts")],
+  entry: {
+    web: path.join(process.cwd() + "/src/index.ts")
+  },
   source: {
-    dir: path.join(process.cwd(), "src")
+    dir: path.join(process.cwd(), "./src")
   },
   output: {
-    path: path.join(process.cwd(), 'lib'),
+    path: path.join(process.cwd(), './lib'),
   },
+  module: {},
   options: {
     sourceMaps: true,
     module: {
