@@ -22,7 +22,7 @@
   },
   "scripts": {
     "prepublishOnly": "yarn build && yarn test && yarn types",
-    "swcbundler": "swcBundler -h",
+    "swcbundler": "npx swcBundler",
     "build": "npm run clean && concurrently npm:module-* && concurrently npm:types-*",
     "clean": "rimraf lib",
     "bundle": "swc src -d lib",
@@ -74,6 +74,7 @@
     "@swc/cli": "^0.1.63",
     "@swc/core": "1.2.239",
     "@swc/jest": "^0.2.29",
+    "node-swc": "^0.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.10.4",
     "@types/semver": "^7.3.13",

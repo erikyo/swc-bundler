@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { getOptions } from "./options.js";
-import { readLocalFile } from "./fs.js";
-import { readPackageJson } from "./utils.js";
-import { version as swcCoreVersion } from "@swc/core";
+import {  parseConfig, readPackageJson } from "./utils.js";
+import { version as swcCoreVersion } from "@swc/core/";
 import * as os from "os";
+import { bundler, watchFiles } from "./bundler.js";
+import path from "path";
 
 /**
  * Runs the program by parsing command line arguments and calling the bundler function.
@@ -16,10 +17,23 @@ export async function swcBundler() {
   const pkg = await readPackageJson();
   // Get the options from the command line
   const cliCommands = await getOptions(pkg);
-  // get the bundler config file
-  const bundleConfig = await readLocalFile( cliCommands.config ) as string
+  const bundleConfig = await parseConfig(cliCommands);
 
-  console.log( "🟡 Starting bundler..." );
+
+  const bundleBaseConfig = {
+    entry: [
+      path.join(process.cwd(),  "./src/index.ts")
+    ],
+    output: {
+      path: path.join(process.cwd(), './lib'),
+    },
+  }
+
+  const swcOptions = {
+    ...bundleBaseConfig,
+  }
+
+  console.log( "📦 Swc-Bundler - A speedy bundler for SWC" );
   console.log( `Version: ${pkg.version}\n @swc/core: ${swcCoreVersion}\n CPU Cores: ${os.cpus().length}\n OS Arch: ${os.arch()}` );
 
   // If the watch flag is set, watch for file changes and trigger rebuilds
@@ -27,7 +41,7 @@ export async function swcBundler() {
     // Watch for file changes and trigger rebuilds
     try {
       // while the user did not press command + c key to exit the process in watch mode keep watching
-      await watchFiles( cliCommands, bundleConfig );
+      await watchFiles( swcOptions );
     } catch (err) {
       console.error(err);
     } finally {
@@ -36,10 +50,10 @@ export async function swcBundler() {
   }
 
   console.log( "🟢 Starting bundler..." );
-  console.log( "With config file ", cliCommands.config );
+  console.log( "With config file ", swcOptions );
 
   // Call the bundler function
-  await bundle( cliCommands, bundleConfig );
+  await bundler( swcOptions );
 }
 
 // Parse the command line arguments and swcBundler the bundler function

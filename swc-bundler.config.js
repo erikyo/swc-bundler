@@ -1,15 +1,18 @@
-import { config } from "@swc/core/spack";
 import path from "path";
 
-module.exports = config({
-  entry: {
-    web: path.join(process.cwd() + "/src/index.ts")
-  },
+/** @type {SwcBundle} */
+const config = {
+  entry: [
+    // path.join(process.cwd() + "/src/api/index.ts"),
+    // path.join(process.cwd() + "/src/client/index.ts"),
+    path.join(process.cwd() + "/src/index.ts")
+  ],
   source: {
     dir: path.join(process.cwd(), "./src")
   },
   output: {
     path: path.join(process.cwd(), './lib'),
+    file: undefined
   },
   module: {},
   options: {
@@ -46,31 +49,32 @@ module.exports = config({
     },
   },
   modules: [
-    config({
+    {
       output: {
-        format: 'cjs',
-        name: 'swcBundler',
+        type: 'cjs',
+        entry: 'swcBundler',
         outDir: 'dist/cjs/',
         sourcemap: true,
         configFile: '.swcBundler-cjs',
       }
-    }),
-    config({
+    },
+    {
       output: {
-        format: 'umd',
-        name: 'swcBundler',
+        type: 'umd',
         outFile: 'dist/umd/swcBundler.umd'
       }
-    }),
-    config({
+    },
+    {
       output: {
-        format: 'esm',
-        type: 'es6',
+        type: 'esm',
+        target: 'es6',
         preserveModules: true,
         preserveModulesRoot: 'src',
         sourcemap: true,
         outDir: 'dist/esm/'
       }
-    })
+    }
   ]
-});
+};
+
+export default config

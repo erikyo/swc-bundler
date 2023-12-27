@@ -12,7 +12,7 @@ import { access, constants } from "node:fs";
  * @return {boolean} True if the directory exists and is accessible,
  *                   false if an error occurs.
  */
-const isDirExist = (folderPath: string): boolean => {
+const pathExist = (folderPath: string): boolean => {
   try {
     access(folderPath, constants.R_OK | constants.W_OK,
       (err) => {
@@ -33,12 +33,8 @@ const isDirExist = (folderPath: string): boolean => {
  * @return {Promise<string>} A promise that resolves with the file contents.
  */
 export async function readLocalFile( path: string )  {
-  if ( isDirExist(path) ) {
-    const data = await readFile( path, (err, data) => {
-      if (err) throw err;
-      return data.toString();
-    })
-    return data
+  if ( pathExist(path) ) {
+    return await readFile( path, { encoding: 'utf8' })
   } else {
     throw new Error(`File not found: ${path}`);
   }
@@ -62,9 +58,13 @@ export async function writeOutput(output: any, spackOptions: any) {
 
     mkdir(dirname(fullPath), { recursive: true });
 
-    writeFile(fullPath, output[name].code, "utf-8");
+    writeFile(fullPath, output[name].code, (err) => {
+      if (err) throw err;
+    });
     if (output[name].map) {
-      writeFile(`${fullPath}.map`, output[name].map, "utf-8");
+      writeFile(`${fullPath}.map`, output[name].map, (err) => {
+        if (err) throw err;
+      });
     }
   });
 
